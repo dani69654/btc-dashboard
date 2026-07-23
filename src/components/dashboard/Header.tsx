@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { AddressSearch } from "./AddressSearch";
+import { formatBlockHeight } from "@/lib/format";
 
 type HeaderProps = {
   isLive: boolean;
   lastUpdatedLabel?: string;
+  blockHeight?: number;
 };
 
 function useClock(): string | null {
@@ -28,7 +30,7 @@ function useClock(): string | null {
   return now;
 }
 
-export function Header({ isLive, lastUpdatedLabel }: HeaderProps) {
+export function Header({ isLive, lastUpdatedLabel, blockHeight }: HeaderProps) {
   const clock = useClock();
 
   return (
@@ -47,6 +49,11 @@ export function Header({ isLive, lastUpdatedLabel }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-3 text-[11px] tabular-nums text-ink-muted">
+        {blockHeight != null && (
+          <span className="hidden font-medium text-ink-soft sm:inline">
+            Block {formatBlockHeight(blockHeight)}
+          </span>
+        )}
         {lastUpdatedLabel && (
           <span className="hidden sm:inline">upd. {lastUpdatedLabel}</span>
         )}

@@ -1,10 +1,30 @@
-import type { AddressOverview, AddressTransaction } from "./types";
+import type { AddressOverview, AddressTransaction, ChainStats } from "./types";
 
 const MEMPOOL_API = "https://mempool.space/api";
 
+type MempoolFees = {
+  fastestFee: number;
+  halfHourFee: number;
+  hourFee: number;
+  economyFee: number;
+};
+
+type MempoolInfo = {
+  count: number;
+  vsize: number;
+};
+
+type MempoolDifficulty = {
+  progressPercent: number;
+  difficultyChange: number;
+  remainingBlocks: number;
+};
+
 type MempoolAddressInfo = {
   chain_stats: {
+    funded_txo_count: number;
     funded_txo_sum: number;
+    spent_txo_count: number;
     spent_txo_sum: number;
     tx_count: number;
   };
@@ -29,6 +49,34 @@ async function mempoolFetch<T>(path: string): Promise<T> {
     throw new Error(`mempool.space request failed: ${res.status} ${res.statusText}`);
   }
   return (await res.json()) as T;
+}
+
+/** Fetches tip height, mempool size, fee estimates, and difficulty progress. */
+export async function fetchChainStats(): Promise<ChainStats> {
+  const [blockHeight, fees, mempool, difficulty] = await Promise.all([
+    mempoolFetch<number>("/blocks/tip/height"),
+    mempoolFetch<MempoolFees>("/v1/fees/recommended"),
+    mempoolFetch<MempoolInfo>("/mempool"),
+    mempoolFetch<MempoolDifficulty>("/v1/difficulty-adjustment"),
+  ]);
+
+  return {
+    blockHeight,
+    mempoolTxCount: mempool.count,
+    mempoolVsize: mempool.vsize,
+    fees: {
+      fastest: fees.fastestFee,
+      halfHour: fees.halfHourFee,
+      hour: fees.hourFee,
+      economy: fees.economyFee,
+    },
+    difficulty: {
+      progressPercent: difficulty.progressPercent,
+      changePercent: difficulty.difficultyChange,
+      remainingBlocks: difficulty.remainingBlocks,
+    },
+    updatedAt: new Date().toISOString(),
+  };
 }
 
 /**
@@ -63,6 +111,8 @@ export async function fetchAddressOverview(address: string): Promise<AddressOver
       blockTime: tx.status.block_time ? new Date(tx.status.block_time * 1000).toISOString() : null,
       feeSats: tx.fee,
       netSats: received - sent,
+      inputCount: tx.vin.length,
+      outputCount: tx.vout.length,
     };
   });
 
@@ -73,6 +123,8 @@ export async function fetchAddressOverview(address: string): Promise<AddressOver
     totalReceivedSats,
     totalSentSats,
     txCount: info.chain_stats.tx_count,
+    fundedTxoCount: info.chain_stats.funded_txo_count,
+    spentTxoCount: info.chain_stats.spent_txo_count,
     transactions,
   };
 }

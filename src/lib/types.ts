@@ -35,6 +35,8 @@ export type AddressTransaction = {
   feeSats: number;
   /** Net effect of this transaction on the queried address, in satoshis (negative = sent). */
   netSats: number;
+  inputCount: number;
+  outputCount: number;
 };
 
 export type AddressOverview = {
@@ -44,5 +46,26 @@ export type AddressOverview = {
   totalReceivedSats: number;
   totalSentSats: number;
   txCount: number;
+  fundedTxoCount: number;
+  spentTxoCount: number;
   transactions: AddressTransaction[];
+};
+
+/** Live Bitcoin network snapshot from mempool.space. */
+export type ChainStats = {
+  blockHeight: number;
+  mempoolTxCount: number;
+  mempoolVsize: number;
+  fees: {
+    fastest: number; // sat/vB — next block
+    halfHour: number;
+    hour: number;
+    economy: number;
+  };
+  difficulty: {
+    progressPercent: number;
+    changePercent: number;
+    remainingBlocks: number;
+  };
+  updatedAt: string; // ISO datetime
 };

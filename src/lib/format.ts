@@ -38,6 +38,14 @@ export function formatBtc(sats: number): string {
   return `${(sats / 1e8).toFixed(8)} BTC`;
 }
 
+export function formatSats(sats: number): string {
+  return `${sats.toLocaleString("en-US")} sats`;
+}
+
+export function formatBlockHeight(height: number): string {
+  return height.toLocaleString("en-US");
+}
+
 export function formatSignedBtc(sats: number): string {
   const sign = sats > 0 ? "+" : sats < 0 ? "−" : "";
   return `${sign}${Math.abs(sats / 1e8).toFixed(8)} BTC`;

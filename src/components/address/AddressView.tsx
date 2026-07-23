@@ -4,7 +4,15 @@ import Link from "next/link";
 import { useBitcoinAddress } from "@/hooks/useBitcoinAddress";
 import { Badge } from "@/components/ui/Badge";
 import { StatTile } from "@/components/dashboard/StatTile";
-import { formatBtc, formatDate, formatSignedBtc, formatTime, truncateMiddle } from "@/lib/format";
+import {
+  formatBlockHeight,
+  formatBtc,
+  formatDate,
+  formatSats,
+  formatSignedBtc,
+  formatTime,
+  truncateMiddle,
+} from "@/lib/format";
 
 type AddressViewProps = {
   address: string;
@@ -12,6 +20,7 @@ type AddressViewProps = {
 
 export function AddressView({ address }: AddressViewProps) {
   const { data, isLoading, error } = useBitcoinAddress(address);
+  const utxoCount = data ? data.fundedTxoCount - data.spentTxoCount : 0;
 
   return (
     <div className="flex min-h-screen flex-col bg-plane">
@@ -85,11 +94,25 @@ export function AddressView({ address }: AddressViewProps) {
               />
             </div>
 
+            <div className="grid grid-cols-2 divide-x divide-hairline rounded-sm border border-hairline bg-surface">
+              <StatTile
+                label="Transactions"
+                value={data.txCount.toLocaleString("en-US")}
+                tooltip="Number of confirmed transactions that involve this address."
+              />
+              <StatTile
+                label="UTXOs"
+                value={utxoCount.toLocaleString("en-US")}
+                sublabel={`${data.fundedTxoCount.toLocaleString("en-US")} in · ${data.spentTxoCount.toLocaleString("en-US")} out`}
+                tooltip="Unspent outputs still held by this address (funded outputs minus spent outputs)."
+              />
+            </div>
+
             <div className="flex flex-col gap-2 rounded-sm border border-hairline bg-surface p-3.5">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
-                  Transactions
-                  <span className="text-ink"> ({data.txCount.toLocaleString("en-US")})</span>
+                  Recent transactions
+                  <span className="text-ink"> ({data.transactions.length})</span>
                 </span>
                 <a
                   href={`https://mempool.space/address/${address}`}
@@ -114,17 +137,36 @@ export function AddressView({ address }: AddressViewProps) {
                     href={`https://mempool.space/tx/${tx.txid}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-between gap-3 py-2 text-xs transition-colors hover:bg-surface-raised"
+                    className="flex items-center justify-between gap-3 py-2.5 text-xs transition-colors hover:bg-surface-raised"
                   >
-                    <div className="flex flex-col gap-0.5">
+                    <div className="flex min-w-0 flex-col gap-0.5">
                       <span className="font-mono text-ink-soft">{truncateMiddle(tx.txid)}</span>
-                      <span className="text-[10px] text-ink-muted">
-                        {tx.blockTime
-                          ? `${formatDate(tx.blockTime)} ${formatTime(tx.blockTime)}`
-                          : "Pending"}
+                      <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-ink-muted">
+                        {tx.blockHeight != null ? (
+                          <span>
+                            Block{" "}
+                            <span className="tabular-nums text-ink-soft">
+                              {formatBlockHeight(tx.blockHeight)}
+                            </span>
+                          </span>
+                        ) : (
+                          <span>Unconfirmed</span>
+                        )}
+                        {tx.blockTime && (
+                          <span>
+                            {formatDate(tx.blockTime)} {formatTime(tx.blockTime)}
+                          </span>
+                        )}
+                        <span>
+                          Fee{" "}
+                          <span className="tabular-nums text-ink-soft">{formatSats(tx.feeSats)}</span>
+                        </span>
+                        <span className="tabular-nums">
+                          {tx.inputCount} in · {tx.outputCount} out
+                        </span>
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex shrink-0 items-center gap-2">
                       <Badge tone={tx.confirmed ? "neutral" : "accent"}>
                         {tx.confirmed ? "Confirmed" : "Pending"}
                       </Badge>

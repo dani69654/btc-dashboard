@@ -2,9 +2,11 @@
 
 import { useBitcoinPrice } from "@/hooks/useBitcoinPrice";
 import { useBitcoinHistory } from "@/hooks/useBitcoinHistory";
+import { useBitcoinNetwork } from "@/hooks/useBitcoinNetwork";
 import { Header } from "./Header";
 import { PriceCard } from "./PriceCard";
 import { StatsGrid } from "./StatsGrid";
+import { NetworkStats } from "./NetworkStats";
 import { TimeframeStats } from "./TimeframeStats";
 import { MomentumCard } from "./MomentumCard";
 import { HistoryStatusCard } from "./HistoryStatusCard";
@@ -18,18 +20,26 @@ export function Dashboard() {
     isLoading: isHistoryLoading,
     error: historyError,
   } = useBitcoinHistory();
+  const {
+    stats: network,
+    isLoading: isNetworkLoading,
+    error: networkError,
+  } = useBitcoinNetwork();
 
   return (
     <div className="flex min-h-screen flex-col bg-plane">
       <Header
         isLive={!priceError}
         lastUpdatedLabel={lastFetchedAt ? formatTime(lastFetchedAt.toISOString()) : undefined}
+        blockHeight={network?.blockHeight}
       />
 
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-3 px-4 py-4 sm:px-6">
         <PriceCard quote={quote} isLoading={isPriceLoading} error={priceError} />
 
         <StatsGrid quote={quote} history={history} />
+
+        <NetworkStats stats={network} isLoading={isNetworkLoading} error={networkError} />
 
         <TimeframeStats history={history} />
 
