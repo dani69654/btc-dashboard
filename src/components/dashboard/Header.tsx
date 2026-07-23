@@ -39,7 +39,6 @@ export function Header({ isLive, lastUpdatedLabel }: HeaderProps) {
         <h1 className="text-xs font-semibold uppercase tracking-widest text-ink">
           BTC<span className="text-ink-muted">/</span>USD
         </h1>
-        <span className="hidden text-[11px] text-ink-muted sm:inline">Yahoo Finance</span>
       </div>
 
       <div className="flex items-center gap-3 text-[11px] tabular-nums text-ink-muted">

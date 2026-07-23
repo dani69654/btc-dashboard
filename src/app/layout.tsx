@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "BTC Dashboard",
-  description: "Bitcoin price dashboard with local historical data from Yahoo Finance",
+  description: "Bitcoin price dashboard with local historical data",
 };
 
 export default function RootLayout({

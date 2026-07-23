@@ -118,7 +118,7 @@ export function TimeframeStats({ history }: TimeframeStatsProps) {
         <StatTile
           label="Avg Volume"
           value={stats ? formatCompactUsd(stats.averageVolume) : "—"}
-          tooltip="Average daily trading volume (in USD) over the selected period, as reported by Yahoo Finance."
+          tooltip="Average daily trading volume (in USD) over the selected period."
         />
         <StatTile
           label="Candles"
