@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AddressSearch } from "./AddressSearch";
 
 type HeaderProps = {
   isLive: boolean;
@@ -39,6 +40,10 @@ export function Header({ isLive, lastUpdatedLabel }: HeaderProps) {
         <h1 className="text-xs font-semibold uppercase tracking-widest text-ink">
           BTC<span className="text-ink-muted">/</span>USD
         </h1>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <AddressSearch />
       </div>
 
       <div className="flex items-center gap-3 text-[11px] tabular-nums text-ink-muted">

@@ -33,3 +33,17 @@ export function formatTime(iso: string): string {
     timeStyle: "medium",
   }).format(new Date(iso));
 }
+
+export function formatBtc(sats: number): string {
+  return `${(sats / 1e8).toFixed(8)} BTC`;
+}
+
+export function formatSignedBtc(sats: number): string {
+  const sign = sats > 0 ? "+" : sats < 0 ? "−" : "";
+  return `${sign}${Math.abs(sats / 1e8).toFixed(8)} BTC`;
+}
+
+export function truncateMiddle(value: string, chars = 8): string {
+  if (value.length <= chars * 2 + 1) return value;
+  return `${value.slice(0, chars)}…${value.slice(-chars)}`;
+}

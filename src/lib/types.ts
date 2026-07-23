@@ -26,3 +26,23 @@ export type BitcoinQuote = {
   dayLow: number;
   marketTime: string; // ISO datetime
 };
+
+export type AddressTransaction = {
+  txid: string;
+  confirmed: boolean;
+  blockHeight: number | null;
+  blockTime: string | null; // ISO datetime, null while unconfirmed
+  feeSats: number;
+  /** Net effect of this transaction on the queried address, in satoshis (negative = sent). */
+  netSats: number;
+};
+
+export type AddressOverview = {
+  address: string;
+  balanceSats: number;
+  unconfirmedBalanceSats: number;
+  totalReceivedSats: number;
+  totalSentSats: number;
+  txCount: number;
+  transactions: AddressTransaction[];
+};
